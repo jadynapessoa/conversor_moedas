@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Conversor de Moedas</title>
+    <style>
+        body {
+            background-color: #efebe9; 
+            font-family: Arial, sans-serif;
+            text-align: center;
+            display: flex;
+            flex-direction: column;
+            /* min-height: 100vh; estende o footer */
+            margin: 80;
+            padding: 120px;
+        }
+        #app {
+            flex-grow: 0; /* Para estender o conteúdo até o final da página */
+            max-width: 300px;
+            margin: 0 auto;
+            padding: 50px;
+            background-color:#d7ccc8;
+            border-radius: 5px;
+            box-shadow: 2 4px 8px rgba(0, 0, 0, 0.2); /* Sombra */
+        }
+        h1 {
+            color: #6d4c41; /* Cor do título mais escura */
+            font-size: x-larger;
+        }
+        label{
+            color: #6d4c41;
+        }
+        select, input {
+            width: 100%;
+            padding: 15px;
+            margin: 10px 0;
+            border: 1.5px solid #8d6e63;
+            border-radius: 10px;
+        }
+        p {
+            font-weight: bold;
+            color: #4e342e; /* Cor do texto escuro */
+        }
+        footer {
+            margin-top: 20px;
+            color: #8d6e63; /* Cor do texto do footer */
+        }
+        footer a {
+            color: #3e2723; /* Cor do link no footer */
+        }
+        .card {
+            padding: 10px;
+            border: 1px solid #8d6e63;
+            border-radius: 4px;
+            margin-top: 10px;
+            background-color: #f9f9f9; /* Cor de fundo dos cards */
+        }
+        .input-card {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .input-card input {
+            flex-grow: 1;
+        }
+    </style>
+</head>
+<body>
+    <div id="app">
+        <h1>Conversor de Moedas</h1>
+
+        <!-- Card para inserir o valor em real -->
+        <div class="card input-card">
+            <label for="amount">Valor em Real (BRL):</label>
+            <input type="number" v-model="amount" id="amount">
+        </div>
+
+        <!-- Card para selecionar o tipo de moeda -->
+        <div class="card">
+            <label for="moedaSelecionada">Escolha a moeda:</label>
+            <select v-model="moedaSelecionada" id="moedaSelecionada">
+                <option value="all">Todas as Moedas</option>
+                <option value="USD">Dólar Americano (USD)</option>
+                <option value="CAD">Dólar Canadense (CAD)</option>
+                <option value="EUR">Euro (EUR)</option>
+            </select>
+        </div>
+
+        <!-- Card que acessa todas as moedas selecionadas -->
+        <div class="card" v-if="moedaSelecionada === 'all'">
+            <label>Valores convertidos:</label>
+            <div class="mini-card" v-for="(taxa, currency) in taxasCambio" :key="currency">
+                <p>{{ currency }}:</p>
+                <p>{{ (amount * taxa).toFixed(2) }} {{ currency }}</p>
+            </div>
+        </div>
+        
+        <!-- Card que mostra o resultado  -->
+        <div class="card" v-else>
+            <label>Valor convertido:</label>
+            <p>{{ (amount * taxasCambio[moedaSelecionada]).toFixed(2) }} {{ moedaSelecionada }}</p>
+        </div>
+
+    </div>
+
+    <footer>
+        Repositório do <a href="https://github.com/jadynapessoa" target="_blank">Github</a>
+    </footer>
+
+    <script src="https://cdn.jsdelivr.net/npm/vue@2.6.14/dist/vue.js"></script>
+    <script>
+        new Vue({
+            el: '#app',
+            data: {
+                amount: 1, // default do valor 1 como real
+                taxasCambio: {}, // taxa de cambio
+                moedaSelecionada: 'USD', // default da moeda
+            },
+            methods: {
+                fetchTaxasCambio: function () {
+                    const apiKey = '42c00843ec7f16240dba273f'; // api
+                    const apiUrl = `https://v6.exchangerate-api.com/v6/${apiKey}/latest/BRL`;
+                    
+                    fetch(apiUrl)
+                        .then(response => response.json())
+                        .then(data => {
+                            this.taxasCambio = data.conversion_rates;
+                        })
+                        .catch(error => {
+                            console.error('Taxa de câmbio não encontrada', error);
+                        });
+                },
+            },
+            mounted: function () {
+                this.fetchTaxasCambio();
+            },
+        });
+    </script>
+</body>
+</html>
