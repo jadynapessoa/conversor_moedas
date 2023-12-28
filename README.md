@@ -1,5 +1,5 @@
 # conversor_moedas
-
+Projeto feito em Vue.js via CDN para treinar o consumo de Api.
 ## Documentações:
 Api: https://www.exchangerate-api.com/ <br>
 Vue.js: https://vuejsbr-docs-next.netlify.app/
